@@ -1,4 +1,4 @@
-# Type of functions
+# FrontEnd Functions
 
 This Solidity program is a simple functiopn program that demonstrates the basic syntax and functionality of the Solidity programming language. The purpose is to display the values of the functions in a frontend webpage using html.
 
