@@ -65,6 +65,8 @@ To compile the code, click on the "Solidity Compiler" tab in the left-hand sideb
 
 Once the code is compiled, you can deploy the contract by clicking on the "Deploy & Run Transactions" tab in the left-hand sidebar. Select the "Mytoken" contract from the dropdown menu, and then click on the "Deploy" button.
 
+Once the contract is deployed you can use the functions within the contract.
+
 ## Authors
 
 Bjorn
