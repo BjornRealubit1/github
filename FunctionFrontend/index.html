@@ -3,48 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simple Bank DApp</title>
+    <title>Simple Shop DApp</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.5/web3.min.js"></script>
   </head>
   <body>
-    <h1>Simple Bank DApp</h1>
+    <h1>Simple Shop DApp</h1>
 
-    <button id="connectButton">Connect to Metamask</button>
-    <p id="accountAddress">Account: Not connected</p>
-    <p id="balance">Balance: 0 ETH</p>
+    <button onclick = "connectMetamask()">Connect to Metamask</button>
+    <p id="accountAddress"></p>
 
-    <button id="depositButton">Deposit</button>
-    <input type="number" id="depositAmount" placeholder="Amount" />
+    <div class="item">
+      <p>Item: Mouse - 1 ETH</p>
+      <input type="number" id="mouseQuantity" placeholder="Quantity" />
+      <button onclick="buyItem(1)">Buy</button>
+      <p id="mouseStatus"></p>
+    </div>
 
-    <button id="withdrawButton">Withdraw</button>
-    <input type="number" id="withdrawAmount" placeholder="Amount" />
+    <div class="item">
+      <p>Item: Keyboard - 1 ETH</p>
+      <input type="number" id="keyboardQuantity" placeholder="Quantity" />
+      <button onclick="buyItem(2)">Buy</button>
+      <p id="keyboardStatus"></p>
+    </div>
+
+    <div class="item">
+      <p>Item: Monitor - 1 ETH</p>
+      <input type="number" id="monitorQuantity" placeholder="Quantity" />
+      <button onclick="buyItem(3)">Buy</button>
+      <p id="monitorStatus"></p>
+    </div>
 
     <script>
-      const contractAddress = "0xfc8B4A6d9ffFd56F9F1070ceB0dBF3FE63a9e7f0";
+      const contractAddress = "0xB225e2cC8Df868c08df9a21b1402048f74d04f8B";
       const contractABI = [
         {
-          inputs: [],
-          name: "deposit",
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "itemId",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "quantity",
+              type: "uint256",
+            },
+          ],
+          name: "buyItem",
           outputs: [],
           stateMutability: "payable",
           type: "function",
         },
         {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "withdraw",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
           inputs: [],
-          name: "getBalance",
+          name: "keyboardPrice",
           outputs: [
             {
               internalType: "uint256",
@@ -55,13 +67,62 @@
           stateMutability: "view",
           type: "function",
         },
-      ]; // Replace with the actual ABI
+        {
+          inputs: [],
+          name: "monitorPrice",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "mousePrice",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_mousePrice",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_keyboardPrice",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_monitorPrice",
+              type: "uint256",
+            },
+          ],
+          name: "setItemPrices",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ];
 
       let web3;
       let contractInstance;
 
       async function connectMetamask() {
-        if (window.ethereum) {
+        if (window.ethereum) {  
           web3 = new Web3(window.ethereum);
           try {
             await window.ethereum.enable();
@@ -92,25 +153,47 @@
         ).textContent = `Balance: ${web3.utils.fromWei(balance, "ether")} ETH`;
       }
 
-      async function deposit() {
-        const amount = document.getElementById("depositAmount").value;
+      async function buyItem(itemId) {
         const accounts = await web3.eth.getAccounts();
-        await contractInstance.methods
-          .deposit()
-          .send({
-            from: accounts[0],
-            value: web3.utils.toWei(amount, "ether"),
-          });
-        updateAccountInfo();
+        const quantity =
+          itemId === 1
+            ? document.getElementById("mouseQuantity").value
+            : itemId === 2
+            ? document.getElementById("keyboardQuantity").value
+            : itemId === 3
+            ? document.getElementById("monitorQuantity").value
+            : 0;
+
+        if (quantity <= 0) {
+          return;
+        }
+
+        try {
+          const transaction = await contractInstance.methods
+            .buyItem(itemId, quantity)
+            .send({
+              from: accounts[0],
+              value: web3.utils.toWei(quantity, "ether"),
+            });
+
+          if (transaction.status) {
+            displayStatus(itemId, "Transaction successful!");
+            updateAccountInfo();
+          } else {
+            displayStatus(itemId, "Transaction failed");
+          }
+        } catch (error) {
+          displayStatus(itemId, "Transaction failed");
+          console.error(error);
+        }
       }
 
-      async function withdraw() {
-        const amount = document.getElementById("withdrawAmount").value;
-        const accounts = await web3.eth.getAccounts();
-        await contractInstance.methods
-          .withdraw(web3.utils.toWei(amount, "ether"))
-          .send({ from: accounts[0] });
-        updateAccountInfo();
+      function displayStatus(itemId, message) {
+        const statusElement = document.getElementById(`${itemId}Status`);
+        statusElement.textContent = message;
+        setTimeout(() => {
+          statusElement.textContent = "";
+        }, 3000);
       }
 
       document
