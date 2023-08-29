@@ -4,7 +4,7 @@ This Solidity program is a simple functiopn program that demonstrates the basic 
 
 ## Description
 
-This program is a simple contract written in Solidity, a programming language used for developing smart contracts on the Ethereum blockchain. The contract has three functions: deposit, withdraw, and get balance.
+This program is a simple contract written in Solidity, a programming language used for developing smart contracts on the Ethereum blockchain. The contract has buyItem and setItems.
 ## Getting Started
 
 ### Executing program
@@ -13,24 +13,41 @@ To run this program, you can use Remix, an online Solidity IDE. To get started, 
 
 Once you are on the Remix website, create a new file by clicking on the "+" icon in the left-hand sidebar.
 
-```// SPDX-License-Identifier: MIT
+```
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-contract SimpleBank {
+contract SimpleShop {
     mapping(address => uint256) private balances;
+    uint256 public mousePrice = 1 ether;
+    uint256 public keyboardPrice = 1 ether;
+    uint256 public monitorPrice = 1 ether;
 
-    function deposit() public payable {
+
+    function buyItem(uint256 itemId, uint256 quantity) public payable {
+        require(itemId >= 1 && itemId <= 3, "Invalid item ID");
+        uint256 itemPrice;
+        if (itemId == 1) {
+            itemPrice = mousePrice;
+        } else if (itemId == 2) {
+            itemPrice = keyboardPrice;
+        } else if (itemId == 3) {
+            itemPrice = monitorPrice;
+        }
+
+        require(
+            msg.value >= itemPrice * quantity,
+            "Insufficient funds to buy the items"
+        );
+
         balances[msg.sender] += msg.value;
     }
 
-    function withdraw(uint256 amount) public {
-        require(balances[msg.sender] >= amount, "Insufficient balance");
-        balances[msg.sender] -= amount;
-        payable(msg.sender).transfer(amount);
-    }
 
-    function getBalance() public view returns (uint256) {
-        return balances[msg.sender];
+    function setItemPrices(uint256 _mousePrice, uint256 _keyboardPrice, uint256 _monitorPrice) public {
+        mousePrice = _mousePrice;
+        keyboardPrice = _keyboardPrice;
+        monitorPrice = _monitorPrice;
     }
 }
 ```
