@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-contract SimpleBank {
+contract SimpleShop {
     mapping(address => uint256) private balances;
     uint256 public mousePrice = 1 ether;
     uint256 public keyboardPrice = 1 ether;
