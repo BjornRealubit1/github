@@ -20,6 +20,11 @@ contract CustomToken is ERC20 {
         _mint(account, amount);
     }
 
+    function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
+        _transfer(_msgSender(), recipient, amount);
+        return true;
+    }
+
     function burn(uint256 amount) public {
         _burn(msg.sender, amount);
     }
