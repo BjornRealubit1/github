@@ -5,6 +5,7 @@ This Solidity program is a simple functiopn program that demonstrates the basic 
 ## Description
 
 This program is a simple contract written in Solidity, a programming language used for developing smart contracts on the Ethereum blockchain. The contract has a three functions that mint, burn, and transfer tokens, but only the mint functions has a modifier that the owner of the contract can only access.
+
 ## Getting Started
 
 ### Executing program
@@ -34,6 +35,11 @@ contract CustomToken is ERC20 {
 
     function mint(address account, uint256 amount) public onlyOwner {
         _mint(account, amount);
+    }
+
+    function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
+        _transfer(_msgSender(), recipient, amount);
+        return true;
     }
 
     function burn(uint256 amount) public {
